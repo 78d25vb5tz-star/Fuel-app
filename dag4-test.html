@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>FUEL — Dag 4 koppelingstest</title>
+  <style>
+    :root{--ink:#101916;--lime:#B9F575;--paper:#F5F6F0;--muted:#627068;--line:#D9DED5}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;font-size:15px}
+    main{max-width:760px;margin:auto;padding:32px 18px 65px}header{display:flex;align-items:center;gap:14px;margin-bottom:18px}header strong{letter-spacing:.14em;font-size:24px}header .dot{width:36px;height:36px;background:var(--lime);border-radius:12px;display:grid;place-items:center;font-weight:900}
+    h1{font-size:clamp(28px,5vw,46px);line-height:1.1;letter-spacing:-.055em;margin:0 0 12px}h2{font-size:18px;margin:0 0 16px;letter-spacing:-.02em}.sub{color:var(--muted);line-height:1.55;margin:0 0 22px}
+    section{background:#fff;border:1px solid var(--line);padding:22px;border-radius:21px;margin:18px 0;box-shadow:0 9px 25px #10191608}label{font-size:13px;color:#39463E;font-weight:700;display:block;margin:12px 0 5px}
+    input{width:100%;padding:12px 13px;border:1px solid #c9d0c8;border-radius:10px;background:#fff;color:var(--ink);font:inherit}input:focus{outline:2px solid #6BA53F;border-color:transparent}button{border:0;border-radius:11px;padding:12px 18px;background:var(--ink);color:white;font-weight:700;cursor:pointer;font:inherit}button.primary{background:var(--lime);color:var(--ink);font-weight:800}button:disabled{opacity:.4;cursor:not-allowed}.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:17px}.note{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.6}
+    .badge{display:inline-block;border-radius:999px;padding:5px 10px;background:#e3f4d0;color:#244b13;font-size:12px;font-weight:800}.status{white-space:pre-wrap;background:#101916;color:#e7fbd9;border-radius:15px;padding:16px;font-family:ui-monospace,Consolas,monospace;font-size:12px;line-height:1.8;min-height:72px;max-height:360px;overflow:auto}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:610px){.two{grid-template-columns:1fr}section{padding:17px}}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<main>
+  <header><div class="dot">F</div><strong>FUEL</strong><span class="badge">DAG 4 · TECHNISCHE TEST</span></header>
+  <h1>Je eigen account.<br>Je eigen gegevens.</h1>
+  <p class="sub">Dit is een tijdelijk testscherm. Het verandert niets aan de goedgekeurde FUEL-interface. Je controleert hier of Supabase, je persoonlijke account en de centrale NEVO-database werken.</p>
+
+  <section>
+    <h2>1 · Supabase verbinden</h2>
+    <label for="url">Project URL (begint met https://)</label><input id="url" type="url" placeholder="https://xxxxxxxx.supabase.co" autocomplete="off" spellcheck="false">
+    <label for="key">Publishable key (begint met sb_publishable_)</label><input id="key" type="text" placeholder="sb_publishable_..." autocomplete="off" spellcheck="false">
+    <div class="row"><button id="connect" class="primary">Verbind testomgeving</button><button id="clear">Verbinding vergeten</button></div>
+    <p class="note">De publishable key is bedoeld voor een website. Plak hier NOOIT een <b>secret</b>, <b>service_role</b>, Garmin-sleutel of databasewachtwoord. Deze pagina slaat alleen de project-URL en publishable key lokaal in de browser op.</p>
+  </section>
+
+  <section>
+    <h2>2 · Account aanmaken of inloggen</h2>
+    <label for="name">Voornaam voor Fuel</label><input id="name" autocomplete="given-name" placeholder="Ruben">
+    <label for="email">E-mailadres</label><input id="email" type="email" autocomplete="email" placeholder="jij@voorbeeld.nl">
+    <label for="password">Wachtwoord (minimaal 8 tekens)</label><input id="password" type="password" autocomplete="current-password" placeholder="••••••••">
+    <div class="row"><button id="signup" class="primary">Account maken</button><button id="signin">Inloggen</button><button id="signout">Uitloggen</button></div>
+    <p class="note">Bij e-mailbevestiging ontvang je eerst een mail van Supabase. Daarna keer je terug naar deze testpagina. Stuur je wachtwoord nooit in de chat.</p>
+  </section>
+
+  <section>
+    <h2>3 · Werkt de database per gebruiker?</h2>
+    <p id="who" class="sub">Nog niet ingelogd.</p>
+    <div class="row"><button id="profile" class="primary">Controleer mijn profiel</button><button id="privacy">Controleer gegevensscheiding</button></div>
+    <div class="two">
+      <div><label for="protein">Persoonlijk eiwitdoel (g/dag)</label><input id="protein" type="number" value="160" min="0" max="400"></div>
+      <div><label>&nbsp;</label><button id="goal">Sla eiwitdoel op</button></div>
+    </div>
+    <div class="row"><button id="water" class="primary">+ 250 ml water opslaan</button><button id="waterRead">Mijn waterregistraties ophalen</button></div>
+  </section>
+
+  <section>
+    <h2>4 · Werkt de gedeelde NEVO-database?</h2>
+    <label for="food">Zoek voedingsmiddelen</label><input id="food" type="search" value="Skyr" placeholder="Bijv. Skyr">
+    <div class="row"><button id="foodSearch" class="primary">Zoek in NEVO</button><button id="foodCount">Tel NEVO-producten</button></div>
+    <p class="note">Verwacht na volledige import: 2.328 voedingsmiddelen, 137 voedingsstoffen en 260.400 voedingswaarden. Bron: NEVO-online versie 2025/9.0, RIVM, Bilthoven.</p>
+  </section>
+
+  <section><h2>Testlog (zonder wachtwoorden of sleutels)</h2><div id="log" class="status" role="status" aria-live="polite">FUEL: configureer eerst Supabase.</div></section>
+</main>
+<script>
+(()=>{
+  let sb=null, currentUser=null;
+  const $=id=>document.getElementById(id);
+  const log=(msg)=>{const el=$('log');el.textContent=(el.textContent.startsWith('FUEL: configureer')?'':el.textContent+'\n')+new Date().toLocaleTimeString('nl-NL')+' · '+msg;el.scrollTop=el.scrollHeight};
+  const err=(e)=>{log('⚠️ '+(e?.message||String(e)).slice(0,300))};
+  const action=(id,fn)=>$(id).addEventListener('click',async()=>{try{await fn()}catch(e){err(e)}});
+  const requireClient=()=>{if(!sb)throw Error('Klik eerst op Verbind testomgeving.');return sb};
+  const requireUser=()=>{requireClient();if(!currentUser)throw Error('Log eerst in.');return currentUser};
+  const refreshUser=async()=>{
+    if(!sb)return;
+    const {data,error}=await sb.auth.getUser();if(error&&error.message.toLowerCase().includes('session')){currentUser=null;return}
+    currentUser=data?.user||null;
+    $('who').textContent=currentUser?'Ingelogd als '+currentUser.email:'Nog niet ingelogd.';
+    log(currentUser?'✅ Ingelogd (persoonlijke gebruikerssessie actief).':'ℹ️ Geen actieve gebruiker.');
+  };
+  const saved=JSON.parse(localStorage.getItem('fuel_day4_public_config')||'null');
+  if(saved){$('url').value=saved.url;$('key').value=saved.key}
+  action('connect',async()=>{
+    const url=$('url').value.trim().replace(/\/$/,'');const key=$('key').value.trim();
+    if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url))throw Error('Controleer de project-URL uit Supabase.');
+    if(key.startsWith('sb_secret_')||key.toLowerCase().includes('service_role'))throw Error('STOP: secret/service_role is niet veilig in de browser!');
+    if(!(key.startsWith('sb_publishable_')||(key.startsWith('eyJ')&&key.length>100)))throw Error('Gebruik uitsluitend de publishable key (of legacy anon key).');
+    if(!window.supabase?.createClient)throw Error('Supabase SDK kon niet laden. Controleer je internetverbinding.');
+    sb=window.supabase.createClient(url,key);
+    localStorage.setItem('fuel_day4_public_config',JSON.stringify({url,key}));
+    log('✅ Supabase-client gestart. Nu inloggen of een account aanmaken.');
+    await refreshUser();
+  });
+  action('clear',async()=>{localStorage.removeItem('fuel_day4_public_config');$('url').value='';$('key').value='';sb=null;currentUser=null;log('Lokale projectinstellingen gewist.');});
+  action('signup',async()=>{
+    requireClient();const email=$('email').value.trim(), password=$('password').value, name=$('name').value.trim();
+    if(password.length<8)throw Error('Gebruik minimaal 8 tekens voor je wachtwoord.');
+    const {data,error}=await sb.auth.signUp({email,password,options:{data:{display_name:name||'Fuel gebruiker'},emailRedirectTo:location.origin+'/dag4-test.html'}});if(error)throw error;
+    $('password').value='';
+    log(data.session?'✅ Account gemaakt en ingelogd.':'✅ Aanmelding ingediend. Controleer je e-mail voor bevestiging; dit kan nodig zijn voordat je kunt inloggen.');
+    await refreshUser();
+  });
+  action('signin',async()=>{
+    requireClient();const email=$('email').value.trim(),password=$('password').value;
+    const {error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;
+    $('password').value='';log('✅ Aanmelding geslaagd.');await refreshUser();
+  });
+  action('signout',async()=>{requireClient();const {error}=await sb.auth.signOut();if(error)throw error;currentUser=null;$('who').textContent='Uitgelogd.';log('✅ Uitgelogd.');});
+  action('profile',async()=>{
+    const u=requireUser();const {data,error}=await sb.from('fuel_profiles').select('display_name,created_at').eq('id',u.id).single();if(error)throw error;
+    log('✅ Je persoonlijke Fuel-profiel is gevonden: '+data.display_name);
+  });
+  action('privacy',async()=>{
+    requireUser();const {data,error}=await sb.from('fuel_profiles').select('id');if(error)throw error;
+    log(data?.length===1?'✅ RLS-controle: je ziet precies je eigen profiel.':'⚠️ Profielen zichtbaar: '+(data?.length??0)+'. Controleer RLS!');
+  });
+  action('goal',async()=>{
+    const u=requireUser();const target=Number($('protein').value);
+    if(!Number.isInteger(target)||target<0||target>400)throw Error('Voer een eiwitdoel van 0–400 g in.');
+    const {error}=await sb.from('fuel_goals').upsert({user_id:u.id,target_protein_g:target,updated_at:new Date().toISOString()});if(error)throw error;
+    const {data,error:readError}=await sb.from('fuel_goals').select('target_protein_g').eq('user_id',u.id).single();if(readError)throw readError;
+    log('✅ Persoonlijk eiwitdoel opgeslagen: '+data.target_protein_g+' g.');
+  });
+  action('water',async()=>{requireUser();const {error}=await sb.from('fuel_hydration_entries').insert({volume_ml:250});if(error)throw error;log('✅ 250 ml water opgeslagen in je eigen Supabase-database.');});
+  action('waterRead',async()=>{
+    requireUser();const d=new Date(),start=new Date(d.getFullYear(),d.getMonth(),d.getDate()),end=new Date(start);end.setDate(start.getDate()+1);
+    const {data,error}=await sb.from('fuel_hydration_entries').select('volume_ml').gte('consumed_at',start.toISOString()).lt('consumed_at',end.toISOString());if(error)throw error;
+    log('✅ Vandaag opgeslagen: '+(data||[]).reduce((s,e)=>s+e.volume_ml,0)+' ml ('+(data||[]).length+' registraties).');
+  });
+  action('foodSearch',async()=>{
+    requireUser();const term=$('food').value.trim();if(term.length<2)throw Error('Voer minstens twee letters in.');
+    const {data,error}=await sb.from('nevo_foods').select('code,name_nl').ilike('name_nl','%'+term+'%').limit(8);if(error)throw error;
+    log('NEVO zoekresultaten: '+(data?.length?data.map(x=>x.name_nl+' (code '+x.code+')').join('; '):'geen resultaat'));
+  });
+  action('foodCount',async()=>{requireUser();const {count,error}=await sb.from('nevo_foods').select('code',{head:true,count:'exact'});if(error)throw error;log('✅ NEVO-producten in de gedeelde database: '+count+' (verwacht 2328).');});
+  if(saved){$('connect').click()}
+})();
+</script>
+</body>
+</html>
