@@ -1,12 +1,11 @@
-/* FUEL demo PWA, no user data or API calls are cached. */
-const CACHE='fuel-demo-v1';
-const STATIC=['/','/index.html','/manifest.webmanifest','/fuel-app-icon-dark-180.png','/fuel-app-icon-dark-192.png','/fuel-app-icon-dark-512.png','/fuel-logo-primary.svg','/fuel-logo-inverse.svg'];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(STATIC)));self.skipWaiting()});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
-self.addEventListener('fetch',e=>{
- if(e.request.method!=='GET'||new URL(e.request.url).origin!==self.location.origin)return;
- e.respondWith(fetch(e.request).then(response=>{
-   if(response.ok){const copy=response.clone();caches.open(CACHE).then(c=>c.put(e.request,copy)).catch(()=>{});}
-   return response;
- }).catch(()=>caches.match(e.request).then(x=>x||caches.match('/index.html'))));
+/* FUEL v5: no session data, user HTML, API calls or health data cached. */
+const NAME='fuel-static-v5';
+const ASSETS=['/fuel-logo.svg','/apple-touch-icon.png','/icon-192.png','/icon-512.png'];
+self.addEventListener('install',event=>{event.waitUntil(caches.open(NAME).then(c=>c.addAll(ASSETS)));self.skipWaiting()});
+self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==NAME).map(k=>caches.delete(k)))));self.clients.claim()});
+self.addEventListener('fetch',event=>{
+ const request=event.request,url=new URL(request.url);
+ if(request.method!=='GET'||url.origin!==self.location.origin)return;
+ if(!ASSETS.includes(url.pathname))return; // HTML altijd online vers ophalen, geen oude demo.
+ event.respondWith(caches.match(request).then(c=>c||fetch(request)));
 });
